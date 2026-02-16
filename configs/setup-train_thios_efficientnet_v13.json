@@ -1,0 +1,49 @@
+{
+    "model_params": {
+        "num_classes": 5,
+        "input_channels": 3,
+        "pred_patch_size": [128, 128],
+        "batch_size": 64,
+        "lr": 0.00005,
+        "num_workers": 6,
+        "background_index": 1,
+        "spatial_dims": 2,
+        "log_dir": "/fslustre/qhs/ext_chen_yuheng_mayo_edu/ThioS_classification/logs/efficientnet_b4_v13_kfold",
+        "encoder_name": "efficientnet-b4",
+        "pretrained": true,
+        "contrast_enhance": false,
+        "early_stopping_patience": 50,
+        "dropout": 0.3,
+        "weight_decay": 0.01,
+        "label_smoothing": 0.0,
+
+        "tversky_params": {
+            "1": {"alpha": 0.5,  "beta": 0.5,  "weight": 1.0},
+            "2": {"alpha": 0.5,  "beta": 0.5,  "weight": 1.5},
+            "3": {"alpha": 0.5,  "beta": 0.5,  "weight": 1.5},
+            "4": {"alpha": 0.5,  "beta": 0.5,  "weight": 2.0}
+        },
+        "focal_weight": 0.5,
+        "tversky_weight": 0.5,
+        "boundary_loss_weight": 0.0
+    },
+    "dataset_params": {
+        "image_dir": "/fslustre/qhs/ext_chen_yuheng_mayo_edu/ThioS_classification/patches_v11/images",
+        "label_dir": "/fslustre/qhs/ext_chen_yuheng_mayo_edu/ThioS_classification/patches_v11/labels",
+        "weight_dir": "/fslustre/qhs/ext_chen_yuheng_mayo_edu/ThioS_classification/patches_v11/weights",
+        "patch_size": [128, 128],
+        "num_classes": 5,
+        "boundary_weight_boost": 0.0,
+        "boundary_width": 0,
+        "oversample_factors": {"4": 2, "2": 1, "3": 1}
+    },
+    "training_params": {
+        "nb_epochs": 500,
+        "accelerator": "gpu",
+        "devices": 1,
+        "strategy": "auto",
+        "precision": "16-mixed"
+    },
+    "version": "v13",
+    "notes": "V13: Conservative boundaries. Reverts to V5-style balanced Tversky (alpha=0.5/beta=0.5 for ALL classes). Key changes from V12: (1) Removed boundary loss entirely (was training on annotation artifacts, not real tissue edges); (2) Removed boundary weight maps (same problem); (3) Halved class weights (tangle=2.0 was 4.0, diffuse=1.5 was 3.0) to reduce over-prediction incentive; (4) Reduced oversampling (tangle 2x was 3x, diffuse 1x was 2x) so model sees more background and learns restraint; (5) Equal focal/tversky weighting (0.5/0.5) for more discriminative predictions. Uses same V11 corrected labels and patches. Goal: match V5/V6 boundary precision with V11 data quality."
+}
